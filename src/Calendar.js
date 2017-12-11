@@ -77,6 +77,11 @@ class Calendar extends React.Component {
     view: PropTypes.string,
 
     /**
+     * An Array of entity objects to which the events belong
+     */
+    entities: PropTypes.arrayOf(PropTypes.object),
+
+    /**
      * An array of event objects to display on the calendar
      */
     events: PropTypes.arrayOf(PropTypes.object),
@@ -597,7 +602,7 @@ class Calendar extends React.Component {
 
   render() {
     let {
-       view, toolbar, events
+      view, toolbar, entities, events
       , culture
       , components = {}
       , formats = {}
@@ -637,34 +642,35 @@ class Calendar extends React.Component {
       >
         {toolbar &&
           <CalToolbar
-            date={current}
-            view={view}
-            views={names}
-            label={label}
-            onViewChange={this.handleViewChange}
-            onNavigate={this.handleNavigate}
-            messages={messages}
+          date={current}
+          view={view}
+          views={names}
+          label={label}
+          onViewChange={this.handleViewChange}
+          onNavigate={this.handleNavigate}
+          messages={messages}
           />
         }
-        <View
-          ref='view'
-          {...props}
-          {...formats}
-          messages={messages}
-          culture={culture}
-          formats={undefined}
-          events={events}
-          date={current}
-          components={viewComponents}
-          getDrilldownView={this.getDrilldownView}
-          onNavigate={this.handleNavigate}
-          onDrillDown={this.handleDrillDown}
-          onSelectEvent={this.handleSelectEvent}
-          onDoubleClickEvent={this.handleDoubleClickEvent}
-          onSelectSlot={this.handleSelectSlot}
-          onShowMore={this._showMore}
-        />
-      </div>
+      <View
+        ref='view'
+        {...props}
+        {...formats}
+        messages={messages}
+        culture={culture}
+        formats={undefined}
+        entities={entities}
+        events={events}
+        date={current}
+        components={viewComponents}
+        getDrilldownView={this.getDrilldownView}
+        onNavigate={this.handleNavigate}
+        onDrillDown={this.handleDrillDown}
+        onSelectEvent={this.handleSelectEvent}
+        onDoubleClickEvent={this.handleDoubleClickEvent}
+        onSelectSlot={this.handleSelectSlot}
+        onShowMore={this._showMore}
+      />
+    </div>
     );
   }
 

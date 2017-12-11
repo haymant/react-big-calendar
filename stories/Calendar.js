@@ -12,16 +12,32 @@ import createEvents from './createEvents';
 // to the correct localizer.
 momentLocalizer(moment); // or globalizeLocalizer
 
-const events = [{
+const entities = [
+  {
+    name: 'lee',
+    id: '1'
+  },
+  {
+    name: 'Court1',
+    id:'2'
+  },
+  {name: 'Zee',
+    id:'3'
+  }];
+
+const events = [
+  {
     title: 'test',
     start: moment().add(1, 'days').subtract(5, 'hours').toDate(),
     end: moment().add(1, 'days').subtract(4, 'hours').toDate(),
+    entity: 'Zee',
     allDay: false
   },
   {
     title: 'test larger',
     start: moment().startOf('day').add(5, 'hours').toDate(),
     end: moment().startOf('day').add(10, 'hours').toDate(),
+    entity: 'Court1',
     allDay: false
   },
 
@@ -29,12 +45,14 @@ const events = [{
     title: 'test larger',
     start: moment().startOf('day').add(15, 'hours').toDate(),
     end: moment().startOf('day').add(23, 'hours').toDate(),
+    entity: 'lee',
     allDay: false
   },
   {
     title: 'test all day',
     start: moment().toDate(),
     end: moment().toDate(),
+    entity: 'Zee',
     allDay: true
   }]
 
@@ -49,7 +67,35 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date(2015, 3, 1)}
         />
       </div>
-    )
+      )
+  })
+
+  .add('scheduler', ()=> {
+    return (
+      <div style={{height: 600}}>
+        <Calendar
+          defaultView="day"
+          min={moment('12:00am', 'h:mma').toDate()}
+          max={moment('11:59pm', 'h:mma').toDate()}
+          entities={entities}
+          events={events}
+          onSelectEvent={action('event selected')}
+          eventPropGetter={(
+            event: Object,
+            start: Date,
+            end: Date,
+            isSelected: boolean
+          ) => {
+            if (event.entity==='lee') {
+              return {style: {backgroundColor:'red'}};
+            } else {
+              return {style: {}};
+            }
+          }}
+          defaultDate={new Date()}
+        />
+      </div>
+      )
   })
 
   .add('default view', () => {
@@ -64,7 +110,7 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date()}
         />
       </div>
-    )
+      )
   })
 
   .add('event layout', () => {
@@ -77,7 +123,7 @@ storiesOf('module.Calendar.week', module)
           events={createEvents(1)}
         />
       </div>
-    )
+      )
   })
 
   .add('selectable', () => {
@@ -94,7 +140,7 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date()}
         />
       </div>
-    )
+      )
   })
 
   .add('selectable, step 15, 4 timeslots', () => {
@@ -113,7 +159,7 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date()}
         />
       </div>
-    )
+      )
   })
 
   .add('selectable, step 10, 6 timeslots', () => {
@@ -132,7 +178,7 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date()}
         />
       </div>
-    )
+      )
   })
 
   .add('selectable, step 5, 6 timeslots', () => {
@@ -151,7 +197,7 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date()}
         />
       </div>
-    )
+      )
   })
 
   .add('selectable, 3 timeslots', () => {
@@ -169,7 +215,7 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date()}
         />
       </div>
-    )
+      )
   })
 
   .add('selectable, 9 timeslots, force now to 9:30am', () => {
@@ -188,7 +234,7 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date()}
         />
       </div>
-    )
+      )
   })
   .add('first of the week all-day event', () => {
     return (
@@ -196,14 +242,14 @@ storiesOf('module.Calendar.week', module)
         <Calendar
           defaultDate={new Date(2016, 11, 4)}
           events={[{
-              allDay: true,
+            allDay: true,
               title: 'All Day Event',
               start: new Date(2016, 11, 4),
               end: new Date(2016, 11, 4)
           }]}
         />
       </div>
-    )
+      )
   })
   .add('end of the week all-day event', () => {
     return (
@@ -211,14 +257,14 @@ storiesOf('module.Calendar.week', module)
         <Calendar
           defaultDate={new Date(2016, 11, 3)}
           events={[{
-              allDay: true,
+            allDay: true,
               title: 'All Day Event',
               start: new Date(2016, 11, 3),
               end: new Date(2016, 11, 3)
           }]}
         />
       </div>
-    )
+      )
   })
   .add('event at end of week', () => {
     return (
@@ -228,13 +274,13 @@ storiesOf('module.Calendar.week', module)
           events={[
             {
               title: 'has time',
-              start: moment(new Date(2016, 11, 3)).add(1, 'days').subtract(5, 'hours').toDate(),
-              end: moment(new Date(2016, 11, 3)).add(1, 'days').subtract(4, 'hours').toDate(),
+                start: moment(new Date(2016, 11, 3)).add(1, 'days').subtract(5, 'hours').toDate(),
+                end: moment(new Date(2016, 11, 3)).add(1, 'days').subtract(4, 'hours').toDate(),
             },
           ]}
         />
       </div>
-    )
+      )
   })
   .add('event at start of week', () => {
     return (
@@ -243,12 +289,12 @@ storiesOf('module.Calendar.week', module)
           defaultDate={new Date(2016, 11, 4)}
           events={[{
             title: 'has time',
-            start: moment(new Date(2016, 11, 4)).add(1, 'days').subtract(5, 'hours').toDate(),
-            end: moment(new Date(2016, 11, 4)).add(1, 'days').subtract(4, 'hours').toDate(),
+              start: moment(new Date(2016, 11, 4)).add(1, 'days').subtract(5, 'hours').toDate(),
+              end: moment(new Date(2016, 11, 4)).add(1, 'days').subtract(4, 'hours').toDate(),
           }]}
         />
       </div>
-    )
+      )
   })
   .add('events on a constrained day column', () => {
     return (
@@ -260,75 +306,75 @@ storiesOf('module.Calendar.week', module)
           events={events}
         />
       </div>
-    )
+      )
   })
   .add('add custom date header', () => {
     return (
-        <div style={{height: 600}}>
-          <Calendar
-            defaultView={Calendar.Views.MONTH}
-            events={events}
-            components={{
-              month: {
-                dateHeader: ({ label }) => <span>{label} - Custom date header</span>
-              }
-            }}
-          />
-        </div>
-    )
+      <div style={{height: 600}}>
+        <Calendar
+          defaultView={Calendar.Views.MONTH}
+          events={events}
+          components={{
+            month: {
+              dateHeader: ({ label }) => <span>{label} - Custom date header</span>
+            }
+          }}
+        />
+      </div>
+      )
   })
   .add('no duration', () => {
     return (
       <div style={{height: 600}}>
         {/* should display all three events */}
-        <Calendar
-          defaultDate={new Date(2016, 11, 4)}
-          events={[
-            {
-              title: 'start of the week',
+      <Calendar
+        defaultDate={new Date(2016, 11, 4)}
+        events={[
+          {
+            title: 'start of the week',
               start: new Date(2016, 11, 4),
               end: new Date(2016, 11, 4)
-            },
-            {
-                title: 'end of the week',
-                start: new Date(2016, 11, 3),
-                end: new Date(2016, 11, 3)
-            },
-            {
-                title: 'middle',
-                start: new Date(2016, 11, 6),
-                end: new Date(2016, 11, 6)
-            }
-          ]}
-        />
-      </div>
+          },
+          {
+            title: 'end of the week',
+            start: new Date(2016, 11, 3),
+            end: new Date(2016, 11, 3)
+          },
+          {
+            title: 'middle',
+            start: new Date(2016, 11, 6),
+            end: new Date(2016, 11, 6)
+          }
+        ]}
+      />
+    </div>
     )
   })
   .add('multi-day', () => {
     return (
       <div style={{height: 600}}>
         {/* should display all three events */}
-        <Calendar
-          showMultiDayTimes
-          defaultDate={new Date(2016, 11, 4)}
-          events={[
-            {
-              title: 'start of the week',
+      <Calendar
+        showMultiDayTimes
+        defaultDate={new Date(2016, 11, 4)}
+        events={[
+          {
+            title: 'start of the week',
               start: new Date(2016, 11, 4, 15),
               end: new Date(2016, 11, 5, 3)
-            },
-            {
-                title: 'end of the week',
-                start: new Date(2016, 11, 3),
-                end: new Date(2016, 11, 3)
-            },
-            {
-                title: 'middle',
-                start: new Date(2016, 11, 6),
-                end: new Date(2016, 11, 6)
-            }
-          ]}
-        />
-      </div>
+          },
+          {
+            title: 'end of the week',
+            start: new Date(2016, 11, 3),
+            end: new Date(2016, 11, 3)
+          },
+          {
+            title: 'middle',
+            start: new Date(2016, 11, 6),
+            end: new Date(2016, 11, 6)
+          }
+        ]}
+      />
+    </div>
     )
   })

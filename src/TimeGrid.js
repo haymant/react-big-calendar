@@ -138,9 +138,22 @@ export default class TimeGrid extends Component {
     })
   }
 
+  scheduleRange(range, entities) {
+    //for day view only
+    if (range.length == 1 && entities !== undefined) {
+      let rangeEnt = [];
+      entities.forEach((entity)=> {
+        rangeEnt.push(range[0]);
+      });
+      return rangeEnt;
+    }
+    return range;
+  }
+
   render() {
     let {
-        events
+      entities
+      , events
       , range
       , width
       , startAccessor
@@ -180,34 +193,38 @@ export default class TimeGrid extends Component {
     return (
       <div className='rbc-time-view'>
 
-        {this.renderHeader(range, allDayEvents, width)}
+        {this.renderHeader(this.scheduleRange(range, entities),
+          range.length!==1?undefined:entities, allDayEvents, width)}
 
-        <div ref='content' className='rbc-time-content'>
-          <div ref='timeIndicator' className='rbc-current-time-indicator' />
+      <div ref='content' className='rbc-time-content'>
+        <div ref='timeIndicator' className='rbc-current-time-indicator' />
 
-          <TimeColumn
-            {...this.props}
-            showLabels
-            style={{ width }}
-            ref={gutterRef}
-            className='rbc-time-gutter'
-          />
+        <TimeColumn
+          {...this.props}
+          showLabels
+          style={{ width }}
+          ref={gutterRef}
+          className='rbc-time-gutter'
+        />
 
-          {this.renderEvents(range, rangeEvents, this.props.now)}
+      {this.renderEvents(this.scheduleRange(range, entities),
+        range.length!==1?undefined:entities, rangeEvents, this.props.now)}
 
-        </div>
       </div>
+    </div>
     );
   }
 
-  renderEvents(range, events, today){
+  renderEvents(range, entities, events, today){
     let { min, max, endAccessor, startAccessor, components } = this.props;
 
     return range.map((date, idx) => {
       let daysEvents = events.filter(
-        event => dates.inRange(date,
+        event => (dates.inRange(date,
           get(event, startAccessor),
-          get(event, endAccessor), 'day')
+          get(event, endAccessor), 'day') &&
+          (entities === undefined || event.entity === entities[idx].name)
+        )
       )
 
       return (
@@ -224,11 +241,11 @@ export default class TimeGrid extends Component {
           date={date}
           events={daysEvents}
         />
-      )
+        )
     })
   }
 
-  renderHeader(range, events, width) {
+  renderHeader(range, entities, events, width) {
     let { messages, rtl, selectable, components, now } = this.props;
     let { isOverflowing } = this.state || {};
 
@@ -250,44 +267,44 @@ export default class TimeGrid extends Component {
             className='rbc-label rbc-header-gutter'
             style={{ width }}
           />
-          { this.renderHeaderCells(range) }
-        </div>
-        <div className='rbc-row'>
-          <div
-            ref={ref => this._gutters[0] = ref}
-            className='rbc-label rbc-header-gutter'
-            style={{ width }}
-          >
-            { message(messages).allDay }
-          </div>
-          <DateContentRow
-            now={now}
-            minRows={2}
-            range={range}
-            rtl={this.props.rtl}
-            events={events}
-            className='rbc-allday-cell'
-            selectable={selectable}
-            onSelectSlot={this.handleSelectAllDaySlot}
-            dateCellWrapper={components.dateCellWrapper}
-            eventComponent={this.props.components.event}
-            eventWrapperComponent={this.props.components.eventWrapper}
-            titleAccessor={this.props.titleAccessor}
-            startAccessor={this.props.startAccessor}
-            endAccessor={this.props.endAccessor}
-            allDayAccessor={this.props.allDayAccessor}
-            eventPropGetter={this.props.eventPropGetter}
-            selected={this.props.selected}
-            onSelect={this.handleSelectEvent}
-            onDoubleClick={this.handleDoubleClickEvent}
-            longPressThreshold={this.props.longPressThreshold}
-          />
-        </div>
+          { this.renderHeaderCells(range, entities) }
       </div>
-    )
+      <div className='rbc-row'>
+        <div
+          ref={ref => this._gutters[0] = ref}
+          className='rbc-label rbc-header-gutter'
+          style={{ width }}
+        >
+          { message(messages).allDay }
+      </div>
+      <DateContentRow
+        now={now}
+        minRows={2}
+        range={range}
+        rtl={this.props.rtl}
+        events={events}
+        className='rbc-allday-cell'
+        selectable={selectable}
+        onSelectSlot={this.handleSelectAllDaySlot}
+        dateCellWrapper={components.dateCellWrapper}
+        eventComponent={this.props.components.event}
+        eventWrapperComponent={this.props.components.eventWrapper}
+        titleAccessor={this.props.titleAccessor}
+        startAccessor={this.props.startAccessor}
+        endAccessor={this.props.endAccessor}
+        allDayAccessor={this.props.allDayAccessor}
+        eventPropGetter={this.props.eventPropGetter}
+        selected={this.props.selected}
+        onSelect={this.handleSelectEvent}
+        onDoubleClick={this.handleDoubleClickEvent}
+        longPressThreshold={this.props.longPressThreshold}
+      />
+    </div>
+  </div>
+  )
   }
 
-  renderHeaderCells(range){
+  renderHeaderCells(range, entities){
     let { dayFormat, culture, components, getDrilldownView } = this.props;
     let HeaderComponent = components.header || Header
 
@@ -303,7 +320,7 @@ export default class TimeGrid extends Component {
           format={dayFormat}
           culture={culture}
         />
-      )
+        )
 
       return (
         <div
@@ -316,18 +333,18 @@ export default class TimeGrid extends Component {
         >
           {drilldownView ? (
             <a
-              href='#'
-              onClick={e => this.handleHeaderClick(date, drilldownView, e)}
+            href='#'
+            onClick={e => this.handleHeaderClick(date, drilldownView, e)}
             >
-              {header}
+            {entities === undefined? header: entities[i].name}
             </a>
-          ) : (
-            <span>
-              {header}
-            </span>
-          )}
+            ) : (
+              <span>
+                {entities === undefined? header: entities[i].name}
+              </span>
+              )}
         </div>
-      )
+        )
     })
   }
 
